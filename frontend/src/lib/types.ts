@@ -2,8 +2,9 @@ export type Belt = 'WHITE' | 'BLUE' | 'PURPLE' | 'BROWN' | 'BLACK'
 
 export interface User {
   id: number
-  email: string
+  email: string | null
   name: string
+  is_quick_start: boolean
   practices_gi: boolean
   gi_belt: Belt | null
   gi_stripes: number

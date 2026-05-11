@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
@@ -29,10 +30,22 @@ class LoginRequest(BaseModel):
         return v.lower()
 
 
+class QuickStartRequest(BaseModel):
+    name: str = Field(..., min_length=2, max_length=50)
+
+    @field_validator("name")
+    @classmethod
+    def name_alphanumeric(cls, v: str) -> str:
+        if not re.match(r"^[a-zA-Z0-9 ]+$", v.strip()):
+            raise ValueError("Name may only contain letters, numbers, and spaces")
+        return v.strip()
+
+
 class UserOut(BaseModel):
     id: int
-    email: str
+    email: str | None
     name: str
+    is_quick_start: bool
     practices_gi: bool
     gi_belt: Belt | None
     gi_stripes: int

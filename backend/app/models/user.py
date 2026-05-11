@@ -19,9 +19,10 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
-    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    email: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True, index=True)
+    password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
+    is_quick_start: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     practices_gi: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     gi_belt: Mapped[Belt | None] = mapped_column(Enum(Belt), nullable=True)
