@@ -22,7 +22,7 @@ export default function Signup() {
     return e
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const errs = validate()
     if (Object.keys(errs).length) { setErrors(errs); return }
@@ -34,21 +34,17 @@ export default function Signup() {
       navigate('/onboarding', { replace: true })
     } catch (err: any) {
       const detail = err.response?.data?.detail
-      if (typeof detail === 'string') {
-        setErrors({ general: detail })
-      } else {
-        setErrors({ general: 'Something went wrong. Please try again.' })
-      }
+      setErrors({ general: typeof detail === 'string' ? detail : 'Something went wrong. Try again.' })
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <AuthLayout title="Create your account" subtitle="Start your BJJ training journal today">
+    <AuthLayout heading="STEP ON THE MAT" tagline="Train. Track. Tap them.">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input
-          label="Name"
+          label="Fighter Name"
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -62,7 +58,7 @@ export default function Signup() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
+          placeholder="fighter@gym.com"
           error={errors.email}
           autoComplete="email"
           required
@@ -77,14 +73,21 @@ export default function Signup() {
           autoComplete="new-password"
           required
         />
-        {errors.general && <p className="text-sm text-red-400">{errors.general}</p>}
-        <Button type="submit" fullWidth loading={loading}>
-          Create account
+        {errors.general && (
+          <p className="text-sm text-red-500 font-medium border-l-2 border-red-600 pl-3">
+            {errors.general}
+          </p>
+        )}
+        <Button type="submit" fullWidth loading={loading} className="mt-2">
+          Begin Your Journey
         </Button>
-        <p className="text-center text-sm text-neutral-500">
-          Already have an account?{' '}
-          <Link to="/login" className="text-neutral-300 hover:text-white transition-colors">
-            Log in
+        <p className="text-center text-xs font-bold uppercase tracking-widest text-neutral-600 pt-2">
+          Already a fighter?{' '}
+          <Link
+            to="/login"
+            className="text-red-500 hover:text-red-400 transition-colors"
+          >
+            Log In →
           </Link>
         </p>
       </form>

@@ -14,7 +14,7 @@ export default function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
     setLoading(true)
@@ -30,14 +30,14 @@ export default function Login() {
   }
 
   return (
-    <AuthLayout title="Welcome back" subtitle="Log in to your training journal">
+    <AuthLayout heading="ENTER THE MAT" tagline="Train. Track. Tap them.">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input
           label="Email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
+          placeholder="fighter@gym.com"
           autoComplete="email"
           required
         />
@@ -50,14 +50,21 @@ export default function Login() {
           autoComplete="current-password"
           required
         />
-        {error && <p className="text-sm text-red-400">{error}</p>}
-        <Button type="submit" fullWidth loading={loading}>
-          Log in
+        {error && (
+          <p className="text-sm text-red-500 font-medium border-l-2 border-red-600 pl-3">
+            {error}
+          </p>
+        )}
+        <Button type="submit" fullWidth loading={loading} className="mt-2">
+          Enter the Mat
         </Button>
-        <p className="text-center text-sm text-neutral-500">
-          No account?{' '}
-          <Link to="/signup" className="text-neutral-300 hover:text-white transition-colors">
-            Sign up
+        <p className="text-center text-xs font-bold uppercase tracking-widest text-neutral-600 pt-2">
+          New fighter?{' '}
+          <Link
+            to="/signup"
+            className="text-red-500 hover:text-red-400 transition-colors"
+          >
+            Create Account →
           </Link>
         </p>
       </form>
