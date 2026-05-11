@@ -5,6 +5,8 @@ import WallOfLegends from './pages/WallOfLegends'
 import Login from './pages/Login'
 import Onboarding from './pages/Onboarding'
 import Dashboard from './pages/Dashboard'
+import TrainingLog from './pages/TrainingLog'
+import LogSession from './pages/LogSession'
 
 function OnboardingRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -50,6 +52,24 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Training log */}
+          <Route
+            path="/log"
+            element={
+              <ProtectedRoute>
+                <TrainingLog />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/log/new"
+            element={
+              <ProtectedRoute>
+                <LogSession />
               </ProtectedRoute>
             }
           />
