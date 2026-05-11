@@ -7,6 +7,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean
 }
 
+const DISPLAY = 'var(--font-display)'
+const OXBLOOD = '#8B1A1A'
+const MUTED = '#737373'
+const BORDER = '#D4CFC0'
+
 export default function Button({
   children,
   variant = 'primary',
@@ -14,29 +19,56 @@ export default function Button({
   fullWidth = false,
   className = '',
   disabled,
+  style,
   ...props
 }: ButtonProps) {
-  const base =
-    'inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold uppercase tracking-widest transition-all duration-150 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed'
+  const base: React.CSSProperties = {
+    fontFamily: DISPLAY,
+    fontSize: '0.78rem',
+    letterSpacing: '0.2em',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.4rem',
+    cursor: disabled || loading ? 'not-allowed' : 'pointer',
+    opacity: disabled || loading ? 0.4 : 1,
+    transition: 'all 0.18s ease',
+    width: fullWidth ? '100%' : undefined,
+    border: 'none',
+  }
 
-  const variants = {
-    primary:
-      'bg-red-600 text-white hover:bg-red-700 hover:-translate-y-px active:translate-y-0 active:bg-red-800 shadow-[0_4px_24px_rgba(220,38,38,0.25)]',
-    secondary:
-      'bg-transparent text-red-500 border-2 border-red-600 hover:bg-red-600 hover:text-white',
-    ghost:
-      'bg-transparent text-neutral-400 hover:text-red-500',
+  const variants: Record<string, React.CSSProperties> = {
+    primary: {
+      background: OXBLOOD,
+      color: '#fff',
+      padding: '0.7rem 1.5rem',
+    },
+    secondary: {
+      background: 'transparent',
+      color: OXBLOOD,
+      border: `1.5px solid ${OXBLOOD}`,
+      padding: '0.65rem 1.5rem',
+    },
+    ghost: {
+      background: 'transparent',
+      color: MUTED,
+      padding: '0.4rem 0',
+      border: `1px solid ${BORDER}`,
+      paddingLeft: '1rem',
+      paddingRight: '1rem',
+    },
   }
 
   return (
     <button
-      className={`${base} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
+      style={{ ...base, ...variants[variant], ...style }}
       disabled={disabled || loading}
+      className={`hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-transform ${className}`}
       {...props}
     >
-      {loading ? (
-        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-      ) : null}
+      {loading && (
+        <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+      )}
       {children}
     </button>
   )

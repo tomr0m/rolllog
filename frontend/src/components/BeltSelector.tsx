@@ -2,14 +2,18 @@ import { motion } from 'framer-motion'
 import type { Belt } from '../lib/types'
 
 const BELT_CONFIG: Record<Belt, { label: string; color: string; textColor: string }> = {
-  WHITE:  { label: 'WHITE',  color: '#F0F0F0', textColor: '#1a1a1a' },
+  WHITE:  { label: 'WHITE',  color: '#EFEFEF', textColor: '#1A1A1A' },
   BLUE:   { label: 'BLUE',   color: '#1E40AF', textColor: '#ffffff' },
   PURPLE: { label: 'PURPLE', color: '#7C3AED', textColor: '#ffffff' },
   BROWN:  { label: 'BROWN',  color: '#78350F', textColor: '#ffffff' },
-  BLACK:  { label: 'BLACK',  color: '#1a1a1a', textColor: '#ffffff' },
+  BLACK:  { label: 'BLACK',  color: '#1A1A1A', textColor: '#ffffff' },
 }
 
 const BELTS: Belt[] = ['WHITE', 'BLUE', 'PURPLE', 'BROWN', 'BLACK']
+const OXBLOOD = '#8B1A1A'
+const MUTED = '#737373'
+const BORDER = '#D4CFC0'
+const DISPLAY = 'var(--font-display)'
 
 interface BeltSelectorProps {
   belt: Belt | null
@@ -26,7 +30,6 @@ function BeltBar({ b, selected, stripes, onClick }: {
 }) {
   const cfg = BELT_CONFIG[b]
   const isWhite = b === 'WHITE'
-  const isBlack = b === 'BLACK'
 
   return (
     <motion.button
@@ -34,40 +37,41 @@ function BeltBar({ b, selected, stripes, onClick }: {
       onClick={onClick}
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
-      className={`w-full relative flex items-center justify-between px-4 h-14 transition-all ${
-        selected
-          ? 'ring-2 ring-red-600 ring-offset-2 ring-offset-[#0a0a0a]'
-          : 'opacity-60 hover:opacity-90'
-      } ${isBlack ? 'border border-[#333]' : ''}`}
-      style={{ backgroundColor: cfg.color }}
+      style={{
+        width: '100%',
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 1rem',
+        height: '2.75rem',
+        backgroundColor: cfg.color,
+        border: selected ? `2px solid ${OXBLOOD}` : `1px solid ${isWhite ? BORDER : 'transparent'}`,
+        opacity: selected ? 1 : 0.6,
+        cursor: 'pointer',
+        transition: 'all 0.15s ease',
+      }}
     >
-      {/* Belt label */}
-      <span
-        className="text-sm font-bold tracking-widest"
-        style={{ fontFamily: 'var(--font-display)', color: cfg.textColor, fontSize: '1rem' }}
-      >
+      <span style={{ fontFamily: DISPLAY, fontSize: '0.85rem', letterSpacing: '0.1em', color: cfg.textColor }}>
         {cfg.label} BELT
       </span>
-
-      {/* Stripe ticks (right side, like a real BJJ belt) */}
-      <div className="flex items-center gap-1">
-        {[0, 1, 2, 3].map((i) => (
+      <div style={{ display: 'flex', gap: '3px' }}>
+        {[0, 1, 2, 3].map(i => (
           <div
             key={i}
-            className="w-2.5 h-8 transition-all"
             style={{
+              width: '9px',
+              height: '26px',
               backgroundColor: selected && i < stripes
-                ? (isWhite ? '#333' : '#f5f5f5')
+                ? (isWhite ? '#555' : '#f5f5f5')
                 : 'transparent',
-              border: `1.5px solid ${isWhite ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.4)'}`,
+              border: `1.5px solid ${isWhite ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.35)'}`,
             }}
           />
         ))}
       </div>
-
-      {/* Selected indicator */}
       {selected && (
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-600" />
+        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '3px', background: OXBLOOD }} />
       )}
     </motion.button>
   )
@@ -75,10 +79,9 @@ function BeltBar({ b, selected, stripes, onClick }: {
 
 export default function BeltSelector({ belt, stripes, onBeltChange, onStripesChange }: BeltSelectorProps) {
   return (
-    <div className="flex flex-col gap-3">
-      {/* Belt rows */}
-      <div className="flex flex-col gap-1.5">
-        {BELTS.map((b) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+        {BELTS.map(b => (
           <BeltBar
             key={b}
             b={b}
@@ -89,23 +92,29 @@ export default function BeltSelector({ belt, stripes, onBeltChange, onStripesCha
         ))}
       </div>
 
-      {/* Stripe selector */}
       {belt && (
-        <div className="mt-2">
-          <p className="text-xs font-bold uppercase tracking-widest text-neutral-500 mb-2">
-            Stripes
-          </p>
-          <div className="flex gap-2">
-            {[0, 1, 2, 3, 4].map((n) => (
+        <div>
+          <div style={{ fontFamily: DISPLAY, fontSize: '0.6rem', letterSpacing: '0.25em', color: MUTED, marginBottom: '0.35rem' }}>
+            STRIPES
+          </div>
+          <div style={{ display: 'flex', gap: '4px' }}>
+            {[0, 1, 2, 3, 4].map(n => (
               <button
                 key={n}
                 type="button"
                 onClick={() => onStripesChange(n)}
-                className={`flex-1 h-10 text-sm font-bold transition-all border ${
-                  stripes === n
-                    ? 'bg-red-600 text-white border-red-600'
-                    : 'bg-transparent text-neutral-500 border-[#333] hover:border-neutral-500 hover:text-neutral-300'
-                }`}
+                style={{
+                  flex: 1,
+                  height: '2.25rem',
+                  fontFamily: DISPLAY,
+                  fontSize: '0.9rem',
+                  letterSpacing: '0.05em',
+                  background: stripes === n ? OXBLOOD : 'transparent',
+                  color: stripes === n ? '#fff' : MUTED,
+                  border: stripes === n ? `1px solid ${OXBLOOD}` : `1px solid ${BORDER}`,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
               >
                 {n}
               </button>

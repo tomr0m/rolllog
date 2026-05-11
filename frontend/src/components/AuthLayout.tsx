@@ -7,45 +7,77 @@ interface AuthLayoutProps {
   tagline?: string
 }
 
+const PAPER = '#EBE6DA'
+const CARD = '#FAF6EF'
+const INK = '#1A1A1A'
+const OXBLOOD = '#8B1A1A'
+const MUTED = '#737373'
+const BORDER = '#D4CFC0'
+const DISPLAY = 'var(--font-display)'
+const SERIF = 'var(--font-serif)'
+
+function formatDate() {
+  const d = new Date()
+  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+  return `${String(d.getDate()).padStart(2, '0')} ${months[d.getMonth()]} ${d.getFullYear()}`
+}
+
 export default function AuthLayout({ children, heading, tagline }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, ease: 'easeOut' }}
-        className="w-full max-w-md"
-      >
-        {/* Logo block */}
-        <div className="text-center mb-8">
-          <h1
-            className="text-6xl text-white tracking-widest leading-none"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            ROLLLOG
-          </h1>
-          {/* Red slash underline */}
-          <div className="relative mt-2 mx-auto w-32 h-0.5 bg-red-600">
-            <div className="absolute -right-3 -top-1 w-3 h-3 bg-red-600 skew-x-12" />
-          </div>
-          {tagline && (
-            <p className="mt-4 text-xs font-bold uppercase tracking-[0.3em] text-neutral-500">
-              {tagline}
-            </p>
-          )}
-        </div>
+    <div style={{ minHeight: '100vh', background: PAPER, color: INK, display: 'flex', flexDirection: 'column' }}>
+      {/* Top strip */}
+      <div style={{
+        flexShrink: 0,
+        height: '50px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderBottom: `2px solid ${INK}`,
+        paddingLeft: 'clamp(1.25rem, 3vw, 2.5rem)',
+        paddingRight: 'clamp(1.25rem, 3vw, 2.5rem)',
+      }}>
+        <span style={{ fontFamily: DISPLAY, fontSize: '0.85rem', letterSpacing: '0.25em' }}>ROLLLOG</span>
+        <div style={{ flex: 1, height: '1px', background: OXBLOOD, margin: '0 clamp(1rem, 3vw, 2.5rem)' }} />
+        <span style={{ fontFamily: DISPLAY, fontSize: '0.7rem', letterSpacing: '0.2em', color: MUTED }}>
+          {formatDate()}
+        </span>
+      </div>
 
-        {/* Card */}
-        <div className="bg-[#1F1F1F] border border-[#262626] border-t-4 border-t-red-600 p-8">
-          <h2
-            className="text-3xl text-white tracking-wider mb-6"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            {heading}
-          </h2>
-          {children}
-        </div>
-      </motion.div>
+      {/* Content */}
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(2rem, 5vw, 4rem) clamp(1.25rem, 5vw, 3rem)' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+          style={{ width: '100%', maxWidth: '440px' }}
+        >
+          {tagline && (
+            <div style={{ fontFamily: DISPLAY, fontSize: '0.6rem', letterSpacing: '0.3em', color: MUTED, marginBottom: '0.75rem' }}>
+              {tagline.toUpperCase()}
+            </div>
+          )}
+
+          <div style={{
+            background: CARD,
+            border: `1px solid ${BORDER}`,
+            borderTop: `3px solid ${OXBLOOD}`,
+            padding: 'clamp(1.5rem, 4vw, 2.5rem)',
+          }}>
+            <h2 style={{
+              fontFamily: SERIF,
+              fontWeight: 900,
+              fontSize: 'clamp(1.8rem, 4vw, 2.4rem)',
+              lineHeight: 0.95,
+              color: INK,
+              marginBottom: '0.4rem',
+            }}>
+              {heading}
+            </h2>
+            <div style={{ height: '1px', background: `${INK}25`, marginBottom: '1.75rem' }} />
+            {children}
+          </div>
+        </motion.div>
+      </div>
     </div>
   )
 }

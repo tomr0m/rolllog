@@ -11,8 +11,8 @@ function OnboardingRoute({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+      <div style={{ height: '100vh', background: '#EBE6DA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="w-5 h-5 border-2 border-[#1A1A1A]/20 border-t-[#1A1A1A] rounded-full animate-spin" />
       </div>
     )
   }

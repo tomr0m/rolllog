@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout'
 import Input from '../components/Input'
 import Button from '../components/Button'
@@ -14,7 +14,7 @@ export default function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault()
     setError('')
     setLoading(true)
@@ -22,21 +22,22 @@ export default function Login() {
       const res = await api.post('/api/auth/login', { email, password })
       login(res.data.access_token, res.data.user)
       navigate(res.data.user.onboarding_done ? '/dashboard' : '/onboarding', { replace: true })
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Invalid email or password')
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail
+      setError(typeof detail === 'string' ? detail : 'Invalid email or password')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <AuthLayout heading="ENTER THE MAT" tagline="Train. Track. Tap them.">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <AuthLayout heading="Enter the Mat." tagline="Classic Login — Email & Password">
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         <Input
           label="Email"
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={e => setEmail(e.target.value)}
           placeholder="fighter@gym.com"
           autoComplete="email"
           required
@@ -45,27 +46,24 @@ export default function Login() {
           label="Password"
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={e => setPassword(e.target.value)}
           placeholder="••••••••"
           autoComplete="current-password"
           required
         />
         {error && (
-          <p className="text-sm text-red-500 font-medium border-l-2 border-red-600 pl-3">
+          <p style={{ fontSize: '0.7rem', color: '#8B1A1A', fontFamily: 'var(--font-serif)', fontStyle: 'italic', borderLeft: '2px solid #8B1A1A', paddingLeft: '0.75rem' }}>
             {error}
           </p>
         )}
-        <Button type="submit" fullWidth loading={loading} className="mt-2">
-          Enter the Mat
+        <Button type="submit" fullWidth loading={loading} style={{ marginTop: '0.5rem' }}>
+          Enter the Mat →
         </Button>
-        <p className="text-center text-xs font-bold uppercase tracking-widest text-neutral-600 pt-2">
-          New fighter?{' '}
-          <Link
-            to="/signup"
-            className="text-red-500 hover:text-red-400 transition-colors"
-          >
-            Create Account →
-          </Link>
+        <p style={{ textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '0.2em', color: '#737373', paddingTop: '0.5rem' }}>
+          Quick start?{' '}
+          <a href="/" style={{ color: '#8B1A1A', textDecoration: 'none' }}>
+            Back to home →
+          </a>
         </p>
       </form>
     </AuthLayout>
