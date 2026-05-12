@@ -27,6 +27,9 @@ class TrainingSession(Base):
     duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
 
     techniques: Mapped[list] = mapped_column(ARRAY(String(50)), nullable=False, default=list)
+    technique_ids: Mapped[list] = mapped_column(
+        ARRAY(Integer), nullable=False, default=list
+    )
     partners: Mapped[list] = mapped_column(ARRAY(String(50)), nullable=False, default=list)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 

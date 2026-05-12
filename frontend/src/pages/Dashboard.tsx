@@ -4,7 +4,8 @@ import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import NavBar from '../components/NavBar'
 import { getRecentSessions, getSessionStats } from '../lib/sessionsApi'
-import type { Belt, SessionStats, TrainingSession } from '../lib/types'
+import { getProgression } from '../lib/techniquesApi'
+import type { Belt, Progression, SessionStats, TrainingSession } from '../lib/types'
 
 const PAPER = '#EBE6DA'
 const CARD = '#FAF6EF'
@@ -35,8 +36,8 @@ const QUOTES = [
 
 const COMING_SOON = [
   { num: '01', title: 'Training Log', live: true },
-  { num: '02', title: 'Technique Tree', live: false },
-  { num: '03', title: 'Progress Stats', live: false },
+  { num: '02', title: 'Technique Compendium', live: true },
+  { num: '03', title: 'Progress Stats', live: true },
   { num: '04', title: 'AI Coach', live: false },
 ]
 
@@ -127,10 +128,12 @@ export default function Dashboard() {
 
   const [stats, setStats] = useState<SessionStats | null>(null)
   const [recent, setRecent] = useState<TrainingSession[]>([])
+  const [progression, setProgression] = useState<Progression | null>(null)
 
   useEffect(() => {
     getSessionStats().then(setStats).catch(() => {})
     getRecentSessions(3).then(setRecent).catch(() => {})
+    getProgression().then(setProgression).catch(() => {})
   }, [])
 
   if (!user) return null
@@ -206,6 +209,95 @@ export default function Dashboard() {
               <StatBlock value={stats.hours_this_month} label="HOURS THIS MONTH" />
               <StatBlock value={stats.total_sessions} label="TOTAL SESSIONS" />
               <StatBlock value={stats.current_streak_days > 0 ? stats.current_streak_days : '—'} label="DAY STREAK" />
+            </div>
+          </motion.div>
+        )}
+
+        {/* PROGRESSION */}
+        {progression && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.28 }}
+            style={{ marginBottom: 'clamp(1.5rem, 3vw, 2.5rem)' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <div style={{ fontFamily: DISPLAY, fontSize: '0.6rem', letterSpacing: '0.3em', color: MUTED }}>PROGRESSION</div>
+              <Link
+                to="/techniques"
+                style={{ fontFamily: DISPLAY, fontSize: '0.58rem', letterSpacing: '0.2em', color: OXBLOOD, textDecoration: 'none', borderBottom: `1px solid ${OXBLOOD}`, paddingBottom: '1px' }}
+              >
+                THE COMPENDIUM →
+              </Link>
+            </div>
+            <div style={{ background: CARD, border: `1px solid ${BORDER}`, padding: 'clamp(1rem, 2vw, 1.5rem)' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'flex-end', marginBottom: '1rem' }}>
+                <div style={{ flex: '0 0 auto' }}>
+                  <div style={{ fontFamily: DISPLAY, fontSize: '0.55rem', letterSpacing: '0.22em', color: MUTED, marginBottom: '0.2rem' }}>XP</div>
+                  <div style={{ fontFamily: SERIF, fontWeight: 900, fontSize: 'clamp(2rem, 4vw, 2.8rem)', lineHeight: 1, color: OXBLOOD }}>
+                    {progression.xp}
+                  </div>
+                </div>
+                <div style={{ flex: '1 1 200px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: DISPLAY, fontSize: '0.55rem', letterSpacing: '0.2em', color: MUTED, marginBottom: '0.3rem' }}>
+                    <span>STRIPE {progression.suggested_stripes} → {progression.suggested_stripes + 1}</span>
+                    <span>{Math.round(progression.progress_to_next_stripe * 100)}%</span>
+                  </div>
+                  <div style={{ height: '4px', background: BORDER, position: 'relative' }}>
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progression.progress_to_next_stripe * 100}%` }}
+                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                      style={{ position: 'absolute', top: 0, left: 0, height: '100%', background: OXBLOOD }}
+                    />
+                  </div>
+                </div>
+                <div style={{ flex: '0 0 auto', textAlign: 'right' }}>
+                  <div style={{ fontFamily: DISPLAY, fontSize: '0.55rem', letterSpacing: '0.22em', color: MUTED, marginBottom: '0.2rem' }}>MASTERED</div>
+                  <div style={{ fontFamily: SERIF, fontWeight: 900, fontSize: 'clamp(1.4rem, 2.6vw, 1.9rem)', lineHeight: 1, color: INK }}>
+                    {progression.mastered}<span style={{ color: MUTED, fontWeight: 400 }}> / {progression.total_techniques}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginTop: '1.25rem' }}>
+                <div>
+                  <div style={{ fontFamily: DISPLAY, fontSize: '0.55rem', letterSpacing: '0.22em', color: OXBLOOD, marginBottom: '0.4rem' }}>NEXT TO MASTER</div>
+                  {progression.next_to_master.length === 0 ? (
+                    <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '0.78rem', color: MUTED }}>
+                      Attempt a technique to get started.
+                    </p>
+                  ) : (
+                    progression.next_to_master.map(t => (
+                      <div key={t.id} style={{ display: 'flex', justifyContent: 'space-between', fontFamily: SERIF, fontSize: '0.85rem', color: INK, marginBottom: '0.15rem' }}>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginRight: '0.5rem' }}>{t.name}</span>
+                        <span style={{ fontFamily: DISPLAY, fontSize: '0.6rem', letterSpacing: '0.1em', color: MUTED, flexShrink: 0 }}>
+                          {t.times_practiced}/{t.times_needed}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+                <div>
+                  <div style={{ fontFamily: DISPLAY, fontSize: '0.55rem', letterSpacing: '0.22em', color: OXBLOOD, marginBottom: '0.4rem' }}>READY TO UNLOCK</div>
+                  {progression.next_unlocks.length === 0 ? (
+                    <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '0.78rem', color: MUTED }}>
+                      Master more techniques to unlock the next tier.
+                    </p>
+                  ) : (
+                    progression.next_unlocks.slice(0, 3).map(u => (
+                      <div key={u.id} style={{ fontFamily: SERIF, fontSize: '0.85rem', color: INK, marginBottom: '0.15rem' }}>
+                        <span>{u.name}</span>
+                        {u.missing_prereqs.length > 0 && (
+                          <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '0.7rem', color: MUTED }}>
+                            needs {u.missing_prereqs.map(p => p.name).join(', ')}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
             </div>
           </motion.div>
         )}

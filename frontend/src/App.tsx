@@ -7,6 +7,7 @@ import Onboarding from './pages/Onboarding'
 import Dashboard from './pages/Dashboard'
 import TrainingLog from './pages/TrainingLog'
 import LogSession from './pages/LogSession'
+import Compendium from './pages/Compendium'
 
 function OnboardingRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -70,6 +71,16 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <LogSession />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Compendium — technique tree */}
+          <Route
+            path="/techniques"
+            element={
+              <ProtectedRoute>
+                <Compendium />
               </ProtectedRoute>
             }
           />

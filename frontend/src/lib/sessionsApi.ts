@@ -1,5 +1,11 @@
 import api from './api'
-import type { Discipline, SessionStats, SessionsResponse, TrainingSession } from './types'
+import type {
+  Discipline,
+  SessionCreateResponse,
+  SessionStats,
+  SessionsResponse,
+  TrainingSession,
+} from './types'
 
 interface CreateSessionPayload {
   date: string
@@ -10,7 +16,7 @@ interface CreateSessionPayload {
   notes?: string
 }
 
-export async function createSession(payload: CreateSessionPayload): Promise<TrainingSession> {
+export async function createSession(payload: CreateSessionPayload): Promise<SessionCreateResponse> {
   const res = await api.post('/api/sessions', payload)
   return res.data
 }

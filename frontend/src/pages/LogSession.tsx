@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import NavBar from '../components/NavBar'
 import TagInput from '../components/TagInput'
-import Toast from '../components/Toast'
+import TechniqueTagInput, { type SelectedTechnique } from '../components/TechniqueTagInput'
+import SessionRewardModal from '../components/SessionRewardModal'
 import { createSession } from '../lib/sessionsApi'
-import type { Discipline } from '../lib/types'
+import { getTechniques } from '../lib/techniquesApi'
+import type { Discipline, SessionRewards, Technique } from '../lib/types'
 
 const PAPER = '#EBE6DA'
 const INK = '#1A1A1A'
@@ -26,9 +28,11 @@ function formatDuration(minutes: number): string {
 export default function LogSession() {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const [toast, setToast] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [catalog, setCatalog] = useState<Technique[]>([])
+  const [rewardModalVisible, setRewardModalVisible] = useState(false)
+  const [rewards, setRewards] = useState<SessionRewards | null>(null)
 
   const today = new Date().toISOString().split('T')[0]
 
@@ -36,7 +40,7 @@ export default function LogSession() {
     date: today,
     discipline: (user?.practices_gi ? 'GI' : 'NO_GI') as Discipline,
     duration_minutes: 90,
-    techniques: [] as string[],
+    techniques: [] as SelectedTechnique[],
     partners: [] as string[],
     notes: '',
   })
@@ -47,26 +51,35 @@ export default function LogSession() {
 
   const canSubmit = form.duration_minutes >= 5 && form.duration_minutes <= 600
 
+  useEffect(() => {
+    getTechniques().then(setCatalog).catch(() => {})
+  }, [])
+
   const handleSubmit = async () => {
     if (!canSubmit) return
     setError('')
     setSubmitting(true)
     try {
-      await createSession({
+      const result = await createSession({
         date: form.date,
         discipline: form.discipline,
         duration_minutes: form.duration_minutes,
-        techniques: form.techniques,
+        techniques: form.techniques.map(t => t.raw),
         partners: form.partners,
         notes: form.notes.trim() || undefined,
       })
-      setToast(true)
-      setTimeout(() => navigate('/log', { replace: true }), 1400)
+      setRewards(result.rewards)
+      setRewardModalVisible(true)
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail
       setError(typeof detail === 'string' ? detail : 'Something went wrong')
       setSubmitting(false)
     }
+  }
+
+  const handleModalClose = () => {
+    setRewardModalVisible(false)
+    navigate('/log', { replace: true })
   }
 
   const showGi = user?.practices_gi
@@ -75,7 +88,7 @@ export default function LogSession() {
   return (
     <div style={{ minHeight: '100vh', background: PAPER, color: INK, display: 'flex', flexDirection: 'column' }}>
       <NavBar />
-      <Toast message="ENTRY SAVED" visible={toast} onHide={() => setToast(false)} />
+      <SessionRewardModal visible={rewardModalVisible} rewards={rewards} onClose={handleModalClose} />
 
       <div style={{ flex: 1, padding: 'clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 5vw, 3rem)', maxWidth: '640px', margin: '0 auto', width: '100%' }}>
 
@@ -204,13 +217,11 @@ export default function LogSession() {
             </p>
           </div>
 
-          {/* TECHNIQUES */}
-          <TagInput
-            label="TECHNIQUES WORKED"
+          {/* TECHNIQUES — hybrid autocomplete + custom */}
+          <TechniqueTagInput
+            catalog={catalog}
             value={form.techniques}
-            onChange={tags => setForm(f => ({ ...f, techniques: tags }))}
-            placeholder="Triangle, Kimura, Mount Escape…"
-            helper="Press Enter after each technique."
+            onChange={techniques => setForm(f => ({ ...f, techniques }))}
             maxTags={30}
           />
 

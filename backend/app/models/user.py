@@ -9,6 +9,7 @@ from app.database import Base
 
 if TYPE_CHECKING:
     from app.models.session import TrainingSession
+    from app.models.technique import UserTechnique
 
 
 class Belt(str, enum.Enum):
@@ -39,6 +40,9 @@ class User(Base):
     start_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     onboarding_done: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
+    xp: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    stripes_earned_in_app: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -51,4 +55,7 @@ class User(Base):
 
     sessions: Mapped[List["TrainingSession"]] = relationship(
         "TrainingSession", back_populates="user", cascade="all, delete-orphan"
+    )
+    user_techniques: Mapped[List["UserTechnique"]] = relationship(
+        "UserTechnique", back_populates="user", cascade="all, delete-orphan"
     )

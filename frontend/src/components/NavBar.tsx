@@ -40,6 +40,7 @@ export default function NavBar() {
         {[
           { to: '/dashboard', label: 'JOURNAL' },
           { to: '/log', label: 'LOG' },
+          { to: '/techniques', label: 'COMPENDIUM' },
         ].map(({ to, label }) => (
           <Link
             key={to}

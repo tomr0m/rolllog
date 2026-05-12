@@ -8,12 +8,19 @@ from app.crud.session import create_session, get_session_by_id, get_session_stat
 from app.database import get_db
 from app.models.session import Discipline
 from app.models.user import User
-from app.schemas.session import SessionCreate, SessionRead, SessionStats, SessionsResponse
+from app.schemas.session import (
+    SessionCreate,
+    SessionCreateResponse,
+    SessionRead,
+    SessionRewards,
+    SessionStats,
+    SessionsResponse,
+)
 
 router = APIRouter(prefix="/api/sessions", tags=["sessions"])
 
 
-@router.post("", response_model=SessionRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=SessionCreateResponse, status_code=status.HTTP_201_CREATED)
 def log_session(
     body: SessionCreate,
     db: Session = Depends(get_db),
@@ -23,7 +30,18 @@ def log_session(
         raise HTTPException(status_code=400, detail="You don't practice Gi")
     if body.discipline == Discipline.NO_GI and not current_user.practices_no_gi:
         raise HTTPException(status_code=400, detail="You don't practice No-Gi")
-    return create_session(db, current_user.id, body)
+    result = create_session(db, current_user, body)
+    return SessionCreateResponse(
+        session=SessionRead.model_validate(result.session),
+        rewards=SessionRewards(
+            xp_gained=result.xp_gained,
+            techniques_mastered=result.techniques_mastered,
+            techniques_unlocked=result.techniques_unlocked,
+            techniques_attempted_early=result.techniques_attempted_early,
+            new_stripe_earned=result.new_stripe_earned,
+            new_stripe_count=result.new_stripe_count,
+        ),
+    )
 
 
 @router.get("/stats", response_model=SessionStats)

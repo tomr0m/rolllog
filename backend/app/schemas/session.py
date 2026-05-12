@@ -52,11 +52,26 @@ class SessionRead(BaseModel):
     discipline: Discipline
     duration_minutes: int
     techniques: List[str]
+    technique_ids: List[int] = Field(default_factory=list)
     partners: List[str]
     notes: Optional[str]
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class SessionRewards(BaseModel):
+    xp_gained: int
+    techniques_mastered: List[str]
+    techniques_unlocked: List[str]
+    techniques_attempted_early: List[str]
+    new_stripe_earned: bool
+    new_stripe_count: Optional[int]
+
+
+class SessionCreateResponse(BaseModel):
+    session: SessionRead
+    rewards: SessionRewards
 
 
 class SessionsResponse(BaseModel):
