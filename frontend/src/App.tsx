@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard'
 import TrainingLog from './pages/TrainingLog'
 import LogSession from './pages/LogSession'
 import Compendium from './pages/Compendium'
+import Coach from './pages/Coach'
 
 function OnboardingRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -81,6 +82,16 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Compendium />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Coach — AI insights dashboard */}
+          <Route
+            path="/coach"
+            element={
+              <ProtectedRoute>
+                <Coach />
               </ProtectedRoute>
             }
           />

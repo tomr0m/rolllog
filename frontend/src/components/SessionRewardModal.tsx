@@ -111,6 +111,27 @@ export default function SessionRewardModal({ visible, rewards, onClose }: Props)
               />
             )}
 
+            {/* Coach's note — the AI speaking, in serif italic prose */}
+            {rewards.coach_note && (
+              <div style={{ marginTop: '1.75rem' }}>
+                <div style={{ textAlign: 'center', color: BORDER, fontSize: '0.85rem', marginBottom: '1rem', letterSpacing: '0.5em' }}>
+                  ❦
+                </div>
+                <div style={{ fontFamily: DISPLAY, fontSize: '0.6rem', letterSpacing: '0.3em', color: OXBLOOD, marginBottom: '0.75rem' }}>
+                  COACH'S NOTE
+                </div>
+                <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '1.05rem', lineHeight: 1.7, color: INK, marginBottom: '0.85rem' }}>
+                  &ldquo;{rewards.coach_note}&rdquo;
+                </p>
+                <div style={{ fontFamily: DISPLAY, fontSize: '0.6rem', letterSpacing: '0.25em', color: MUTED, textAlign: 'right' }}>
+                  — COACH
+                </div>
+                <div style={{ textAlign: 'center', color: BORDER, fontSize: '0.85rem', marginTop: '1rem', letterSpacing: '0.5em' }}>
+                  ❦
+                </div>
+              </div>
+            )}
+
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '2rem' }}>
               <motion.button
                 whileHover={{ scale: 1.02 }}

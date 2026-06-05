@@ -41,6 +41,7 @@ export default function NavBar() {
           { to: '/dashboard', label: 'JOURNAL' },
           { to: '/log', label: 'LOG' },
           { to: '/techniques', label: 'COMPENDIUM' },
+          { to: '/coach', label: 'COACH' },
         ].map(({ to, label }) => (
           <Link
             key={to}

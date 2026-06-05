@@ -67,6 +67,7 @@ class SessionRewards(BaseModel):
     techniques_attempted_early: List[str]
     new_stripe_earned: bool
     new_stripe_count: Optional[int]
+    coach_note: Optional[str] = None
 
 
 class SessionCreateResponse(BaseModel):

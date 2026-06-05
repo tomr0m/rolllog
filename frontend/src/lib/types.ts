@@ -117,6 +117,31 @@ export interface SessionRewards {
   techniques_attempted_early: string[]
   new_stripe_earned: boolean
   new_stripe_count: number | null
+  coach_note: string | null
+}
+
+export interface CoachFocusCard {
+  title: string
+  technique_name: string
+  body: string
+}
+
+export interface CoachPatternCard {
+  title: string
+  body: string
+}
+
+export interface CoachInsights {
+  focus: CoachFocusCard
+  close_to: CoachFocusCard
+  pattern: CoachPatternCard
+  generated_at: string
+}
+
+export interface CoachStatus {
+  ai_enabled: boolean
+  last_insight_at: string | null
+  cache_expires_at: string | null
 }
 
 export interface SessionCreateResponse {

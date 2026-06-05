@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_DAYS: int = 7
     FRONTEND_URL: str = "http://localhost:5173"
+    ANTHROPIC_API_KEY: str = ""
 
 
 settings = Settings()

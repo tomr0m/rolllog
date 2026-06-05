@@ -3,6 +3,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
+from app.ai.coach import AICoach, get_anthropic_client
 from app.core.deps import get_current_user
 from app.crud.session import create_session, get_session_by_id, get_session_stats, get_sessions
 from app.database import get_db
@@ -31,6 +32,14 @@ def log_session(
     if body.discipline == Discipline.NO_GI and not current_user.practices_no_gi:
         raise HTTPException(status_code=400, detail="You don't practice No-Gi")
     result = create_session(db, current_user, body)
+
+    # Generate an AI coaching note for this session. If the AI is unavailable
+    # for any reason, gracefully degrade to None — the session always saves.
+    coach_note: str | None = None
+    client = get_anthropic_client()
+    if client is not None:
+        coach_note = AICoach(client).generate_inline_note(current_user, result.session, db)
+
     return SessionCreateResponse(
         session=SessionRead.model_validate(result.session),
         rewards=SessionRewards(
@@ -40,6 +49,7 @@ def log_session(
             techniques_attempted_early=result.techniques_attempted_early,
             new_stripe_earned=result.new_stripe_earned,
             new_stripe_count=result.new_stripe_count,
+            coach_note=coach_note,
         ),
     )
 
