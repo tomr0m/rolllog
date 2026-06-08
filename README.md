@@ -82,7 +82,7 @@ App available at http://localhost:5173
 
 ## Phase Roadmap
 
-- **Phase 1** ✅ — Auth + profile onboarding
+- **Phase 1**  — Auth + profile onboarding
 - **Phase 2** — Training session logging
 - **Phase 3** — Techniques system + XP/unlocks
 - **Phase 4** — AI coach
